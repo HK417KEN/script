@@ -1,0 +1,32 @@
+#!/bin/bash
+
+function statusColor()
+{
+    case $1 in
+        active)
+            echo -e "\033[0;32m${1}\033[0m"
+            ;;
+        *)
+            echo -e "\033[1;31m${1}\033[0m"
+            ;;
+    esac
+} Exit
+
+function getStatus()
+{
+    output=""
+    for arg in $@
+    do
+        status=`service ${arg} status | grep '\s\+Active:.\+' | sed 's/ (\w\+) since.*$//' | sed 's/^\s\+Active: //g'`
+        #output=${output}`statusColor ${status}`" ${arg} "
+        output=${output}"${arg} "`statusColor ${status} && echo -e " ${blueSeparator} "`
+    done
+    #printf "[ %-s ] %-s\n" $output | column -t
+    printf "${blueSeparator} %-s %-s %-s\t %-s %-s %-s\n" $output | column -t
+    #echo $output
+}
+
+blueSeparator="\033[0;36m|\033[0m"
+echo "Services status:"
+getStatus openresty php5.6-fpm php7.3-fpm mysql
+echo ""
