@@ -1,6 +1,9 @@
 #!/bin/bash
+
 function checkMounted() {
+    OLD_PWD=`pwd`
     cd $1
+    #ls $1 # another way to check
     if [ $? = "0" ];
     then
         if [ "$(ls -Al $1 | egrep '^-|d' | wc -l)" -ge 0 ];
@@ -12,6 +15,7 @@ function checkMounted() {
     else
         echo -e "\033[1;31m[failed]\033[0m  $1"
     fi
+    cd $OLD_PWD
 }
 
 checkMounted /home/shared/
