@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function checkMounted() {
+function mountChecker() {
     ls $1 > /dev/null 2>&1
     if [ $? = "0" ];
     then
@@ -15,5 +15,6 @@ function checkMounted() {
     fi
 }
 
-checkMounted /home/shared/
+echo "Mount checker:"
+mountChecker /home/shared/
 echo ""
