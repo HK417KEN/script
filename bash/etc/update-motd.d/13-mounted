@@ -1,0 +1,18 @@
+#!/bin/bash
+function checkMounted() {
+    cd $1
+    if [ $? = "0" ];
+    then
+        if [ "$(ls -Al $1 | egrep '^-|d' | wc -l)" -ge 0 ];
+        then
+            echo -e "\033[0;32m[mounted]\033[0m $1"
+        else
+            echo -e "\033[1;31m[failed]\033[0m  $1"
+        fi
+    else
+        echo -e "\033[1;31m[failed]\033[0m  $1"
+    fi
+}
+
+checkMounted /home/shared/
+echo ""
