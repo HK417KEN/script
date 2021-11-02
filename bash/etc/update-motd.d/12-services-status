@@ -10,7 +10,7 @@ function statusColor()
             echo -e "\033[1;31m${1}\033[0m"
             ;;
     esac
-} Exit
+}
 
 function getStatus()
 {
