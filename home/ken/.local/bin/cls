@@ -1,0 +1,18 @@
+#/bin/bash
+
+clear
+
+current_user=$USER
+
+SUDO=''
+
+if [ "$EUID" != "0" ]; then SUDO='sudo'; fi
+
+for file in /etc/update-motd.d/*
+do
+    if [ -f $file ]; then
+        $SUDO bash $file
+    fi
+done
+
+last -F $current_user | head -n 1 | awk -F "  " '{printf "Last login: %s %s from %s\n",$11,$12,$8}'
