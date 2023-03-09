@@ -1,12 +1,16 @@
 #/bin/bash
 
-clear
-
 current_user=$USER
 
 SUDO=''
 
-if [ "$EUID" != "0" ]; then SUDO='sudo'; fi
+if [ "$EUID" != "0" ];
+then
+    SUDO='sudo'
+    sudo echo ''
+fi
+
+clear
 
 for file in /etc/update-motd.d/*
 do
