@@ -20,3 +20,6 @@ do
 done
 
 last -F $current_user | head -n 1 | awk -F "  " '{printf "Last login: %s %s from %s\n",$11,$12,$8}'
+
+#last_login_log=$(last -F $current_user | head -n 1)
+#echo $last_login_log | awk -F " " '{printf "Last login: %s %s %s %s %s from %s\n",$4,$5,$6,$7,$8,$3}'
