@@ -22,7 +22,7 @@ def auto_set_live_cover(image, layer, inputFolder, outputFolder):
         
             # Open the file if is a JPEG or PNG or XCF image.
             image = None
-            fileWithoutExt = None
+            fileWithoutExt = ""
             if(file.lower().endswith(('.png'))):
                 image = pdb.file_png_load(inputPath, inputPath)
                 fileWithoutExt = file[0:file.rindex('.png')]
@@ -36,7 +36,8 @@ def auto_set_live_cover(image, layer, inputFolder, outputFolder):
                 image = pdb.gimp_file_load(inputPath, inputPath)
                 fileWithoutExt = file[0:file.rindex('.xcf')]
 
-            outputPath = outputPath + fileWithoutExt + ".xcf"
+            outputPathXCF = outputPath + fileWithoutExt + ".xcf"
+            outputPathJPG = outputPath + fileWithoutExt + ".jpg"
 
             # Verify if the file is an image.
             if(image != None):
@@ -49,19 +50,58 @@ def auto_set_live_cover(image, layer, inputFolder, outputFolder):
                     # resize canvas to 1280x720
                     pdb.gimp_image_resize(image, 1280, 720, 0, 61)
                     # new filter layer
-                    bLayer = pdb.gimp_layer_new(image, 1280, 720, 0, "b", 100., 29)
-                    pdb.gimp_image_add_layer(image, bLayer, 1)
+                    filterLayer = pdb.gimp_layer_new(image, 1280, 720, 0, "b", 100., 29)
+                    pdb.gimp_image_add_layer(image, filterLayer, 1)
                     # copy to background layer
-                    pdb.gimp_image_add_layer(image, pdb.gimp_layer_copy(bLayer, 0), 2)
+                    pdb.gimp_image_add_layer(image, pdb.gimp_layer_copy(filterLayer, 0), 2)
                     # set foreground color to black
                     pdb.gimp_context_set_foreground(gimpcolor.RGB(0,0,0))
                     # fill filter layer to black
-                    pdb.gimp_drawable_edit_bucket_fill(bLayer, 0, 0., 0.)
-                    # set filter layer to 10% opacity (90% transparent)
-                    pdb.gimp_layer_set_opacity(bLayer, 10.)
+                    pdb.gimp_drawable_edit_bucket_fill(filterLayer, 0, 0., 0.)
 
-                    # Save the image.
-                    pdb.gimp_xcf_save(0, image.layers[0], layer, outputPath, outputPath)
+                    # mosaic
+                    tile_size = 26.
+                    tile_height = 4.
+                    tile_spacing = 1.
+                    tile_neatness = 1.
+                    tile_allow_split = 1
+                    light_dir = 135.
+                    color_variation = 0.
+                    antialiasing = 1
+                    color_averaging = 1
+                    tile_type = 1
+                    tile_surface = 1
+                    grout_color = 0
+                    pdb.plug_in_mosaic(
+                        image,
+                        filterLayer,
+                        tile_size,
+                        tile_height,
+                        tile_spacing,
+                        tile_neatness,
+                        tile_allow_split,
+                        light_dir,
+                        color_variation,
+                        antialiasing,
+                        color_averaging,
+                        tile_type,
+                        tile_surface,
+                        grout_color
+                    )
+
+                    # set filter layer to 10% opacity (90% transparent)
+                    pdb.gimp_layer_set_opacity(filterLayer, 10.)
+
+                    # Save the xcf image.
+                    pdb.gimp_xcf_save(0, image, image.layers[0], outputPathXCF, outputPathXCF)
+
+                    # merge layers
+                    while len(image.layers) > 1:
+                        pdb.gimp_image_merge_down(image, image.layers[0], 0)
+
+                    # Save the jpg image.
+                    pdb.file_jpeg_save(image, image.layers[0], outputPathJPG, outputPathJPG, 0.9, 0, 0, 0, "Creating with GIMP", 0, 0, 0, 0)
+
         except Exception as err:
             gimp.message("Unexpected error: " + str(err))
 
